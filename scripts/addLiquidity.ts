@@ -13,18 +13,18 @@ async function main() {
 
     // const amountOut = ethers.parseUnits("20", 18);
     // const amountInMax = ethers.parseUnits("1000", 6);
-    const amountUSDC = ethers.parseUnits("2", 6);
-    const amountUSDCInMax = ethers.parseUnits("5", 6);
-    const amountDAI = ethers.parseUnits("1", 18);
-    const amountDAIInMax = ethers.parseUnits("5", 18);
+    const amountUSDCDesired = ethers.parseUnits("2", 6);
+    const amountUSDCMin = ethers.parseUnits("5", 6);
+    const amountDAIDesired = ethers.parseUnits("1", 18);
+    const amountDAIInMin = ethers.parseUnits("5", 18);
 
     const USDC_Contract = await ethers.getContractAt("IERC20", USDC, impersonatedSigner);
     const DAI_Contract = await ethers.getContractAt("IERC20", DAI, impersonatedSigner);
     
     const ROUTER = await ethers.getContractAt("IUniswapV2Router", ROUTER_ADDRESS, impersonatedSigner);
 
-    await USDC_Contract.approve(ROUTER, amountUSDC);
-    await DAI_Contract.approve(ROUTER, amountDAI);
+    await USDC_Contract.approve(ROUTER, amountUSDCDesired);
+    await DAI_Contract.approve(ROUTER, amountDAIDesired);
    
     const usdcBal = await USDC_Contract.balanceOf(impersonatedSigner.address);
     const daiBal = await DAI_Contract.balanceOf(impersonatedSigner.address);
@@ -33,7 +33,7 @@ async function main() {
     console.log("usdc balance before adding Liquidity", Number(usdcBal));
     console.log("dai balance before adding Liquidity", Number(daiBal));
 
-    if(usdcBal < amountUSDCInMax || daiBal < amountDAIInMax){
+    if(usdcBal < amountUSDCMin || daiBal < amountDAIInMin){
         console.error("Insufficient amount of tokens for adding liquidity");
         return;
       }
@@ -41,8 +41,8 @@ async function main() {
   await ROUTER.addLiquidity(
     USDC,
     DAI,
-    amountUSDC,
-    amountDAI,
+    amountUSDCDesired,
+    amountDAIDesired,
     0,
     0,
     impersonatedSigner,
